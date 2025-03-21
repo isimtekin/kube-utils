@@ -25,6 +25,8 @@ A set of handy Zsh-based command-line utilities to simplify and speed up working
 - ✅ View Kubernetes node info and resource capacity (`knodes`)
 - ✅ Annotate a resource (`kannotate`)
 - ✅ Compare live deployment YAML with a local manifest (`kdiff`)
+- ✅ Backup full cluster resources and Helm releases (`kbackup`)
+- ✅ Restore from cluster resource and Helm manifest backups (`krestore`)
 
 ## 📦 Installation
 
@@ -63,6 +65,8 @@ kexec <ns> <pod> <cmd>            # Execute command in a pod
 knodes                            # Show node info and resource capacity
 kannotate <res> <name> <k> <v>    # Add or update annotation on a resource
 kdiff <ns> <deployment>           # Diff live deployment with local manifest
+kbackup                            # Backup all namespaces, resources, and Helm manifests
+krestore <path>                    # Restore Kubernetes resources and Helm manifests from backup
 ```
 
 All commands are namespace-aware and safe to run.

@@ -160,3 +160,78 @@ kdiff() {
   echo "Paste your manifest to: manifest.yaml and run:"
   echo "diff -u manifest.yaml live.yaml"
 }
+
+kbackup() {
+  local CTX=$(kubectl config current-context)
+  local TS=$(date +%Y%m%d-%H%M%S)
+  local BACKUP_DIR="$HOME/k8s-backup/${CTX}-${TS}"
+  mkdir -p "$BACKUP_DIR"
+
+  echo "🔄 Backing up all namespaces from context '$CTX' to: $BACKUP_DIR"
+
+  local resources=(
+    deployments services configmaps secrets ingress statefulsets daemonsets
+    jobs cronjobs persistentvolumeclaims serviceaccounts roles rolebindings
+    networkpolicies
+  )
+
+  for ns in $(kubectl get ns -o jsonpath="{.items[*].metadata.name}"); do
+    mkdir -p "$BACKUP_DIR/$ns"
+    for res in "${resources[@]}"; do
+      echo "📦 $res in namespace $ns"
+      kubectl get "$res" -n "$ns" -o yaml > "$BACKUP_DIR/$ns/$res.yaml" 2>/dev/null || true
+    done
+
+    # 🧠 Helm release backup (if helm is installed)
+    if command -v helm >/dev/null 2>&1; then
+      echo "🎯 Backing up Helm releases in namespace $ns"
+      helm list -n "$ns" -o json > "$BACKUP_DIR/$ns/helm-releases.json" 2>/dev/null || true
+
+      for release in $(helm list -n "$ns" -q); do
+        helm get all "$release" -n "$ns" > "$BACKUP_DIR/$ns/helm-$release.txt" 2>/dev/null || true
+      done
+    fi
+  done
+
+  echo "✅ Backup complete: $BACKUP_DIR"
+}
+
+
+# Restore a Kubernetes backup from a given directory, including Helm manifests
+krestore() {
+  local DIR=$1
+  if [[ -z "$DIR" ]]; then
+    echo "❌ Usage: krestore <backup-folder-path>"
+    return 1
+  fi
+
+  if [[ ! -d "$DIR" ]]; then
+    echo "❌ Directory does not exist: $DIR"
+    return 1
+  fi
+
+  echo "🔁 Restoring from backup: $DIR"
+
+  for ns_path in "$DIR"/*; do
+    if [[ -d "$ns_path" ]]; then
+      ns=$(basename "$ns_path")
+      echo "🌐 Restoring namespace: $ns"
+      kubectl create namespace "$ns" 2>/dev/null || true
+
+      for file in "$ns_path"/*.yaml; do
+        echo "🧩 Applying $(basename "$file")"
+        kubectl apply -f "$file" --namespace="$ns"
+      done
+
+      # Restore Helm resources from helm-*.txt files
+      for helm_file in "$ns_path"/helm-*.txt; do
+        if [[ -f "$helm_file" ]]; then
+          echo "🔧 Restoring Helm manifest from: $(basename "$helm_file")"
+          kubectl apply -f "$helm_file" --namespace="$ns"
+        fi
+      done
+    fi
+  done
+
+  echo "✅ Restore complete."
+}
