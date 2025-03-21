@@ -33,6 +33,7 @@ You can add this utility set to your machine with a simple `curl` command:
 ```bash
 curl -o ~/.kube-utils.zsh https://raw.githubusercontent.com/isimtekin/kube-utils/main/.kube-utils.zsh
 echo 'source ~/.kube-utils.zsh' >> ~/.zshrc
+echo 'alias kube-utils-update="curl -fsSL https://raw.githubusercontent.com/isimtekin/kube-utils/main/.kube-utils.zsh -o ~/.kube-utils.zsh && source ~/.kube-utils.zsh"'  >> ~/.zshrc
 source ~/.zshrc
 ```
 
