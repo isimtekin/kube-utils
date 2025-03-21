@@ -160,31 +160,3 @@ kdiff() {
   echo "Paste your manifest to: manifest.yaml and run:"
   echo "diff -u manifest.yaml live.yaml"
 }
-
-## 🧪 Usage
-
-```bash
-kservices [namespace]             # List services with their URLs and ports
-kpods [namespace]                 # Show pods with wide output
-kf <namespace> <name-pattern>     # Tail logs of latest pod matching pattern
-ksh <namespace> <pod-name>        # Start shell inside a pod
-kingress                          # Show ingress domain and path mappings
-kcrash                            # List pods in error or crash loop
-kfind <configmap|secret> <kw>    # Search inside ConfigMaps or Secrets
-ktop                              # Show top 10 pods by CPU
-knewest [namespace]               # Most recently created pod
-kctx                              # Show current context and list all
-kns <namespace>                   # Change the active namespace
-kdeploys                          # List all deployments across namespaces
-krollout <deployment> [ns]        # Watch rollout status of a deployment
-kportfwd <ns> <name> <lport> <rport> # Port forward a pod to localhost
-kimg                              # List all images used in deployments
-kdebug                            # Launch temporary BusyBox pod for debugging
-kclean                            # Clean up completed and evicted pods
-kexec <ns> <pod> <cmd>            # Execute command in a pod
-knodes                            # Show node info and resource capacity
-kannotate <res> <name> <k> <v>    # Add or update annotation on a resource
-kdiff <ns> <deployment>           # Diff live deployment with local manifest
-```
-
-All commands are namespace-aware and safe to run.
