@@ -235,3 +235,24 @@ krestore() {
 
   echo "✅ Restore complete."
 }
+
+# Copy a secret from one namespace to another
+ktmvsecret() {
+  local name=$1
+  local src_ns=$2
+  local dest_ns=$3
+  local new_name=${4:-$name}  # Optional: give secret a new name in dest ns
+
+  if [[ -z "$name" || -z "$src_ns" || -z "$dest_ns" ]]; then
+    echo "❌ Usage: ktmvsecret <secret-name> <source-namespace> <destination-namespace> [new-secret-name]"
+    return 1
+  fi
+
+  echo "📥 Getting secret '$name' from namespace '$src_ns'..."
+  kubectl get secret "$name" -n "$src_ns" -o yaml |
+    sed "s/namespace: $src_ns/namespace: $dest_ns/" |
+    sed "s/name: $name/name: $new_name/" |
+    kubectl apply -n "$dest_ns" -f -
+
+  echo "✅ Secret '$name' copied to '$dest_ns' as '$new_name'"
+}

@@ -27,6 +27,7 @@ A set of handy Zsh-based command-line utilities to simplify and speed up working
 - ✅ Compare live deployment YAML with a local manifest (`kdiff`)
 - ✅ Backup full cluster resources and Helm releases (`kbackup`)
 - ✅ Restore from cluster resource and Helm manifest backups (`krestore`)
+- ✅ Copy a Secret from one namespace to another (`ktmvsecret`)
 
 ## 📦 Installation
 
@@ -67,6 +68,7 @@ kannotate <res> <name> <k> <v>    # Add or update annotation on a resource
 kdiff <ns> <deployment>           # Diff live deployment with local manifest
 kbackup                            # Backup all namespaces, resources, and Helm manifests
 krestore <path>                    # Restore Kubernetes resources and Helm manifests from backup
+ktmvsecret <secret> <source-ns> <target-ns> [new-name]  # Copy a secret between namespaces
 ```
 
 All commands are namespace-aware and safe to run.
